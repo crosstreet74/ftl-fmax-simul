@@ -17,23 +17,36 @@ def initMapper():
         translation_table[i][0] = i
         translation_table[i][1] = MAX_BLOCK_NUM - i - 1
         translation_table[i][2] = MAX_BLOCK_NUM + i
-    print('Mapping Table Initialized\n')
+    print('Initialized Mapping Table')
 
 
+# Write to all available Logical Sector(Page) Number
 def write_in_free(SSD):
     for lsn in range(MAX_PAGE_NUM):
-        lbn = int(lsn / BLOCK_SIZE)
-        offset = int(lsn % BLOCK_SIZE)
+        lbn = int(lsn / BLOCK_SIZE) # Logical Block Number
+        offset = int(lsn % BLOCK_SIZE) 
         pbn = translation_table[lbn][1]
-        SSD[pbn][offset][0] = 1
+        
+        # If page already written write to replacement block
+        if SSD[pbn][offset][0] is 1:
+            write_in_rep(SSD, lsn)
+        # or write data area(first index) of located page
+        else:
+            SSD[pbn][offset][0] = 1
 
+# Write to all available Logical Sector(Page) Number
+def write_in_rep(SSD, lsn):
+    lbn = int(lsn / BLOCK_SIZE)
+    offset = int(lsn % BLOCK_SIZE)
+    pbn = translation_table[lbn][1]
+    rep_pbn = translation_table[lbn][2]
 
-def write_in_rep():
-    # do something
-    i = 0
+    SSD[pbn][offset][1] = 1
+    SSD[rep_pbn][offset][0] = 1
+    SSD[rep_pbn][offset][1] = lsn
 
-
-def print_after_write():
+# Print all data of SSD
+def print_after_write(SSD):
     print(SSD)
     print()
 
@@ -42,6 +55,9 @@ def print_after_write():
 if __name__ == "__main__":
 
     SSD = [[[0] * 2 for j in range(BLOCK_SIZE)] for i in range(PLANE_SIZE)]
+    
+    print('Initialized SSD')
+    print_after_write(SSD)
 
     # debug SSD information set
     print('Print SSD information')
@@ -52,13 +68,21 @@ if __name__ == "__main__":
     print()
 
     initMapper()
-    # # debug mapping table initialization
-    # print('LBN\t|\tPBN1\t|\tPBN2\n--------------------------------------')
-    # for i in range(MAX_BLOCK_NUM):
-    #     temp = str(translation_table[i][0]) + '\t|\t' + str(translation_table[i][1]) + '\t|\t' + str(translation_table[i][2])
-    #     print(temp+'\n')
+    
+    # debug mapping table initialization
+    print('LBN\t|\tPBN1\t|\tPBN2\n--------------------------------------')
+    for i in range(MAX_BLOCK_NUM):
+        temp = str(translation_table[i][0]) + '\t|\t' + str(
+            translation_table[i][1]) + '\t|\t' + str(translation_table[i][2])
+        print(temp)
+    print()
 
+    print('Write to All Logical Page Numbers')
     write_in_free(SSD)
-    print_after_write()
+    print_after_write(SSD)
+
+    print('Try to Overwrite to All Logical Page Numbers')
+    write_in_free(SSD)
+    print_after_write(SSD)
 
     print('End of Program')
