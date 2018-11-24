@@ -2,7 +2,7 @@
 # PACKAGE_SIZE = 1
 # DIE_SIZE = 1
 PLANE_SIZE = 20  # Blocks per Plane / Total Blocks
-BLOCK_SIZE = 4  # Pages per Block
+BLOCK_SIZE = 32  # Pages per Block
 MAX_BLOCK_NUM = int(PLANE_SIZE / 2)  # Maximun Block Number
 TOTAL_PAGE = BLOCK_SIZE * PLANE_SIZE  # Total Pages
 MAX_PAGE_NUM = int(BLOCK_SIZE * PLANE_SIZE / 2)  # Maximun Page Number
@@ -53,7 +53,7 @@ def print_after_write(SSD):
 
 # main
 if __name__ == "__main__":
-
+    
     SSD = [[[0] * 2 for j in range(BLOCK_SIZE)] for i in range(PLANE_SIZE)]
     
     print('Initialized SSD')
@@ -85,4 +85,5 @@ if __name__ == "__main__":
     write_in_free(SSD)
     print_after_write(SSD)
 
-    print('End of Program')
+    print()
+    input('End of Program: Press Any Key to Close ')
