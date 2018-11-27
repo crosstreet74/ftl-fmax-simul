@@ -2,7 +2,7 @@
 # PACKAGE_SIZE = 1
 # DIE_SIZE = 1
 PLANE_SIZE = 20  # Blocks per Plane / Total Blocks
-BLOCK_SIZE = 32  # Pages per Block
+BLOCK_SIZE = 4  # Pages per Block
 MAX_BLOCK_NUM = int(PLANE_SIZE / 2)  # Maximun Block Number
 TOTAL_PAGE = BLOCK_SIZE * PLANE_SIZE  # Total Pages
 MAX_PAGE_NUM = int(BLOCK_SIZE * PLANE_SIZE / 2)  # Maximun Page Number
@@ -23,16 +23,17 @@ def initMapper():
 # Write to all available Logical Sector(Page) Number
 def write_in_free(SSD):
     for lsn in range(MAX_PAGE_NUM):
-        lbn = int(lsn / BLOCK_SIZE) # Logical Block Number
-        offset = int(lsn % BLOCK_SIZE) 
+        lbn = int(lsn / BLOCK_SIZE)  # Logical Block Number
+        offset = int(lsn % BLOCK_SIZE)
         pbn = translation_table[lbn][1]
-        
-        # If page already written write to replacement block
+
+        # If page already written
         if SSD[pbn][offset][0] is 1:
             write_in_rep(SSD, lsn)
-        # or write data area(first index) of located page
+        # If not
         else:
             SSD[pbn][offset][0] = 1
+
 
 # Write to all available Logical Sector(Page) Number
 def write_in_rep(SSD, lsn):
@@ -42,8 +43,18 @@ def write_in_rep(SSD, lsn):
     rep_pbn = translation_table[lbn][2]
 
     SSD[pbn][offset][1] = 1
-    SSD[rep_pbn][offset][0] = 1
-    SSD[rep_pbn][offset][1] = lsn
+    for i in range(BLOCK_SIZE):
+        if SSD[rep_pbn][i][0] is 0:
+            SSD[rep_pbn][i][0] = 1
+            SSD[rep_pbn][i][1] = lsn
+            break
+
+        if i is BLOCK_SIZE:
+            block_transfer(pbn)
+
+    # SSD[rep_pbn][offset][0] = 1
+    # SSD[rep_pbn][offset][1] = lsn
+
 
 # Print all data of SSD
 def print_after_write(SSD):
@@ -51,11 +62,15 @@ def print_after_write(SSD):
     print()
 
 
+def block_transfer(pbn):
+    i = 0
+
+
 # main
 if __name__ == "__main__":
-    
+
     SSD = [[[0] * 2 for j in range(BLOCK_SIZE)] for i in range(PLANE_SIZE)]
-    
+
     print('Initialized SSD')
     print_after_write(SSD)
 
@@ -68,7 +83,7 @@ if __name__ == "__main__":
     print()
 
     initMapper()
-    
+
     # debug mapping table initialization
     print('LBN\t|\tPBN1\t|\tPBN2\n--------------------------------------')
     for i in range(MAX_BLOCK_NUM):
