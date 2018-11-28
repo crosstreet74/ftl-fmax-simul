@@ -49,8 +49,8 @@ def write_in_rep(SSD, lsn):
             SSD[rep_pbn][i][1] = lsn
             break
 
-        if i is BLOCK_SIZE:
-            block_transfer(pbn)
+        if i is BLOCK_SIZE - 1:
+            block_transfer(lsn)
 
     # SSD[rep_pbn][offset][0] = 1
     # SSD[rep_pbn][offset][1] = lsn
@@ -62,8 +62,21 @@ def print_after_write(SSD):
     print()
 
 
-def block_transfer(pbn):
-    i = 0
+def block_transfer(lsn):
+    lbn = int(lsn / BLOCK_SIZE)
+    offset = int(lsn % BLOCK_SIZE)
+    pbn = translation_table[lbn][1]
+    rep_pbn = translation_table[lbn][2]
+    # buffer = [[0 for area in range(4)] for p in range(BLOCK_SIZE)]
+    # j = 0
+
+    # for p in range(BLOCK_SIZE):
+    #     i = BLOCK_SIZE - p - 1
+    #     buf_lsn = SSD[rep_pbn][i][1]
+    #     buf_data = SSD[rep_pbn][i][1]
+    #     if buf_lsn is not 0:
+    #         buffer[i][j] = buf_lsn
+    #         j += 1
 
 
 # main
@@ -97,6 +110,10 @@ if __name__ == "__main__":
     print_after_write(SSD)
 
     print('Try to Overwrite to All Logical Page Numbers')
+    write_in_free(SSD)
+    print_after_write(SSD)
+
+    print('Try to Overwrite to Full Replacement Block')
     write_in_free(SSD)
     print_after_write(SSD)
 
