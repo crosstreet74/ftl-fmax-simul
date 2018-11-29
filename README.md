@@ -1,5 +1,5 @@
 # ftl-fmax-simul
-SSD Simulator for FTL algorithm 'FMAX' of M-Systems
+SSD Simulator in FTL algorithm 'FMAX' of M-Systems
 
 ## Plans in Brief
 * Brief Explanation about FMAX FTL Algorithm
