@@ -58,6 +58,10 @@ def write_in_rep(SSD, lsn):
 
 # Print all data of SSD
 def print_after_write(SSD):
+    print(hex(id(SSD)))
+    print(hex(id(SSD[0])))
+    print(hex(id(SSD[0][0])))
+    print(hex(id(SSD[1][0][0])))
     print(SSD)
     print()
 

@@ -3,6 +3,7 @@ SSD Simulator in FTL algorithm 'FMAX' of M-Systems
 
 ## Plans in Brief
 * Brief Explanation about FMAX FTL Algorithm
+* Sequential Existence in Memory
 * Write, Read, Erase, Garbage Collecion, Merge operations with **Time Consciousness**
 * Memory Buffer implementation, Header Distribution, Implementation
 * Beautify Output
