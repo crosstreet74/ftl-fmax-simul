@@ -1,3 +1,5 @@
+import npyscreen
+
 # SSD_SIZE = 1
 # PACKAGE_SIZE = 1
 # DIE_SIZE = 1
@@ -7,6 +9,51 @@ MAX_BLOCK_NUM = int(PLANE_SIZE / 2)  # Maximun Block Number
 TOTAL_PAGE = BLOCK_SIZE * PLANE_SIZE  # Total Pages
 MAX_PAGE_NUM = int(BLOCK_SIZE * PLANE_SIZE / 2)  # Maximun Page Number
 
+class TestApp(npyscreen.NPSApp):
+    def main(self):
+        F  = npyscreen.Form(name = "SSD simulator: ftl-fmax-simul",)
+        ms = F.add(npyscreen.TitleSelectOne, max_height=4, value = [1,], name="Tester",
+                values = ["Run Test"], scroll_exit=True)
+        F.edit()
+        
+        if ms.value is "Run Test":
+            SSD = [[[0] * 2 for j in range(BLOCK_SIZE)] for i in range(PLANE_SIZE)]
+
+            print('Initialized SSD')
+            print_after_write(SSD)
+
+            # debug SSD information set
+            print('Print SSD information')
+            print('> Total Blocks\t\t: ' + str(PLANE_SIZE))
+            print('> Total Pages\t\t: ' + str(TOTAL_PAGE))
+            print('> Maximum Block Number\t: ' + str(MAX_BLOCK_NUM - 1))
+            print('> Maximum Page Number\t: ' + str(MAX_PAGE_NUM - 1))
+            print()
+
+            initMapper()
+
+            # debug mapping table initialization
+            print('LBN\t|\tPBN1\t|\tPBN2\n--------------------------------------')
+            for i in range(MAX_BLOCK_NUM):
+                temp = str(translation_table[i][0]) + '\t|\t' + str(
+                    translation_table[i][1]) + '\t|\t' + str(translation_table[i][2])
+                print(temp)
+            print()
+
+            print('Write to All Logical Page Numbers')
+            write_in_free(SSD)
+            print_after_write(SSD)
+
+            print('Try to Overwrite to All Logical Page Numbers')
+            write_in_free(SSD)
+            print_after_write(SSD)
+
+            print('Try to Overwrite to Full Replacement Block')
+            write_in_free(SSD)
+            print_after_write(SSD)
+
+            print()
+            input('End of Program: Press Any Key to Close ')
 
 # Initialize Table Mapping Logical Block Address to Physical Block Address
 def initMapper():
@@ -85,41 +132,5 @@ def block_transfer(lsn):
 
 # main
 if __name__ == "__main__":
-
-    SSD = [[[0] * 2 for j in range(BLOCK_SIZE)] for i in range(PLANE_SIZE)]
-
-    print('Initialized SSD')
-    print_after_write(SSD)
-
-    # debug SSD information set
-    print('Print SSD information')
-    print('> Total Blocks\t\t: ' + str(PLANE_SIZE))
-    print('> Total Pages\t\t: ' + str(TOTAL_PAGE))
-    print('> Maximum Block Number\t: ' + str(MAX_BLOCK_NUM - 1))
-    print('> Maximum Page Number\t: ' + str(MAX_PAGE_NUM - 1))
-    print()
-
-    initMapper()
-
-    # debug mapping table initialization
-    print('LBN\t|\tPBN1\t|\tPBN2\n--------------------------------------')
-    for i in range(MAX_BLOCK_NUM):
-        temp = str(translation_table[i][0]) + '\t|\t' + str(
-            translation_table[i][1]) + '\t|\t' + str(translation_table[i][2])
-        print(temp)
-    print()
-
-    print('Write to All Logical Page Numbers')
-    write_in_free(SSD)
-    print_after_write(SSD)
-
-    print('Try to Overwrite to All Logical Page Numbers')
-    write_in_free(SSD)
-    print_after_write(SSD)
-
-    print('Try to Overwrite to Full Replacement Block')
-    write_in_free(SSD)
-    print_after_write(SSD)
-
-    print()
-    input('End of Program: Press Any Key to Close ')
+    App = TestApp()
+    App.run()
